@@ -13,8 +13,8 @@ def encrypt_caesar(plaintext):
     """
 laintext = list(input("Введите сообщение: "))
 b = []
-for i in range(len(ciphertext)):
-    s = ord(ciphertext[i])
+for i in range(len(laintext)):
+    s = ord(laintext[i])
     s += 3
     s = chr(s)
     b.append(s)
@@ -38,7 +38,7 @@ def decrypt_caesar(ciphertext):
     >>> decrypt_caesar("")
     ''
     """
-   ciphertext = list(input("Введите сообщение: "))
+   ciphertext = list(input("Введите зашифрованное сообщение: "))
 b = []
 for i in range(len(ciphertext)):
     s = ord(ciphertext[i])
@@ -47,7 +47,7 @@ for i in range(len(ciphertext)):
     b.append(s)
     i += 1
 laintext = ''.join(b)
-print("Зашифрованное сообщение: ", laintext) 
+print("Расшифрованное сообщение: ", laintext) 
 
     return plaintext
 
