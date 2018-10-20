@@ -11,7 +11,17 @@ def encrypt_caesar(plaintext):
     >>> encrypt_caesar("")
     ''
     """
-    # PUT YOUR CODE HERE
+ciphertext = list(input("Введите зашифрованное сообщение: "))
+b = []
+for i in range(len(ciphertext)):
+    s = ord(ciphertext[i])
+    s -= 3
+    s = chr(s)
+    b.append(s)
+    i += 1
+laintext = ''.join(b)
+print("Расшифрованное сообщение: ", laintext)
+    
     return ciphertext
 
 
@@ -30,3 +40,6 @@ def decrypt_caesar(ciphertext):
     """
     # PUT YOUR CODE HERE
     return plaintext
+
+print(encrypt_caesar("PYTHON"))
+print(decrypt_caesar("SBWKRQ"))
