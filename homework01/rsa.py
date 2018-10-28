@@ -65,6 +65,7 @@ def generate_keypair(p, q):
 
     n = p*q
 
+    
     phi = (p-1)*(q-1)
 
     # Choose an integer e such that e and phi(n) are coprime
