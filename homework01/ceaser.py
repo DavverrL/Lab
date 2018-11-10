@@ -31,6 +31,8 @@ def encrypt_caesar(plaintext: str) -> str:
         ciphertext = ''.join(b)
 
     return ciphertext
+
+
 def decrypt_caesar(ciphertext: str) -> str:
     """
     Decrypts a ciphertext using a Caesar cipher.
