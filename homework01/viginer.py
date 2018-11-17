@@ -72,6 +72,7 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
             if((s + a[i]) < ord('a')) and ((s + a[i]) < ord('z')):
                 p = (s + a[i]) - 122
                 s = ord('a') + p - a[i] + 1
+                st = chr(s)
         if(s - a[i]) < 65:
             p = s - 65
             s = 91 + p - a[i]
