@@ -18,15 +18,15 @@ def encrypt_caesar(plaintext: str) -> str:
         for i in range(len(plaintext)):
             s = ord(plaintext[i])
             if 46 <= s <= 57:
-                s = chr(s)
+                st = chr(s)
             else:
                 s += 3
                 if s > ord('Z') and s < ord('a') or s > ord('z'):
                     s -= 26
-                    s = chr(s)
+                    st = chr(s)
                 else:
-                    s = chr(s)
-            b.append(s)
+                    st = chr(s)
+            b.append(st)
             i += 1
         ciphertext = ''.join(b)
 
@@ -53,15 +53,15 @@ def decrypt_caesar(ciphertext: str) -> str:
         for i in range(len(ciphertext)):
             s = ord(ciphertext[i])
             if 46 <= s <= 57:
-                s = chr(s)
+                st = chr(s)
             else:
                 s -= 3
                 if s < ord('a') and s > ord('Z') or s < ord('A'):
                     s += 26
-                    s = chr(s)
+                    st = chr(s)
                 else:
-                    s = chr(s)
-            b.append(s)
+                    st = chr(s)
+            b.append(st)
             i += 1
             plaintext = ''.join(b)
     return plaintext
