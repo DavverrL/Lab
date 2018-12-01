@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, List, Set, Optional
+from typing import Tuple, List, Optional
 
 
 def read_sudoku(puzzle: str) -> List[List[str]]:
@@ -20,7 +20,7 @@ def display(grid: List[List[str]]) -> None:
     print()
 
 
-def group(values: List[str], n=9) -> List[List[str]]:
+def group(values: List[int], n:int = 9) -> List[List[int]]:
     """
     >>> group([1,2,3,4], 2)
     [[1, 2], [3, 4]]
@@ -119,10 +119,10 @@ def find_empty_positions(grid: List[List[str]]) -> Optional[Tuple[int, int]]:
             else:
                 emp += int(grid[row][col])
     if emp == 405:
-        return (-1, -1)
+        return -1, -1
 
 
-def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str]:
+def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> list:
     """
     >>> grid = read_sudoku('puzzle1.txt')
     >>> values = find_possible_values(grid, (0,2))
@@ -146,15 +146,12 @@ def find_possible_values(grid: List[List[str]], pos: Tuple[int, int]) -> Set[str
         for j in get_row(grid, pos):
             if j != '.':
                 row += int(j)
-                r = row
         for j in get_col(grid, pos):
             if j != '.':
                 col += int(j)
-                c = col
         for j in get_block(grid, pos):
             if j != '.':
                 block += int(j)
-                bl = block
         if((row + m) and (col + m) and (block + m)) < 50:
             p.append(i)
     return p
@@ -215,7 +212,6 @@ def generate_sudoku(N: int) -> List[List[str]]:
     True
     """
     gen = 81 - N
-    i = 0
     grid = solve([['.']*9 for i in range(9)])
     k = 0
     while k < gen:
