@@ -61,7 +61,7 @@ def get_col(values: List, pos: Tuple) -> List:
     >>> get_col([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (0, 2))
     ['3', '6', '9']
     """
-    col, row = pos[1]
+    col = pos[1]
     return [i[col] for i in values]
 
 
@@ -82,7 +82,7 @@ def get_block(values: List, pos: Tuple) -> List:
     return block
 
 
-def find_empty_positions(gridfep: List) -> Optional[Tuple]:
+def find_empty_positions(grid: List) -> Optional[Tuple]:
     """ Найти первую свободную позицию в пазле
     >>> find_empty_positions([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']])
     (0, 2)
@@ -99,7 +99,7 @@ def find_empty_positions(gridfep: List) -> Optional[Tuple]:
     return None
 
 
-def find_possible_values(gridfpv: List, pos: Tuple) -> Set:
+def find_possible_values(grid: List, pos: Tuple) -> Set:
     """ Вернуть множество возможных значения для указанной позиции
     >>> grid = read_sudoku('puzzle1.txt')
     >>> values = find_possible_values(grid, (0,2))
@@ -109,9 +109,9 @@ def find_possible_values(gridfpv: List, pos: Tuple) -> Set:
     >>> values == {'2', '5', '9'}
     True
     """
-    block = set(get_block(gridfpv, pos))
-    col = set(get_col(gridfpv, pos))
-    row = set(get_row(gridfpv, pos))
+    block = set(get_block(grid, pos))
+    col = set(get_col(grid, pos))
+    row = set(get_row(grid, pos))
     values = set('123456789')
     return values - block - col - row
 
@@ -196,4 +196,4 @@ if __name__ == '__main__':
         solution = solve(grid)
         end = time.time()
         display(solution)
-print(f'{fname}: {end-start}')
+        print(f'{fname}: {end-start}')
