@@ -1,156 +1,145 @@
-import random
-from copy import deepcopy
 import pygame
+import random
+import copy
 from pygame.locals import *
 
 
 class GameOfLife:
-    """класс визуализации и процесса игры"""
-
-    def __init__(self, width: int = 640, height: int = 480, cell_size: int = 10, speed: int = 10) -> None:
+    def __init__(self, width=640, height=480, cell_size=10, speed=30):
         self.width = width
         self.height = height
         self.cell_size = cell_size
+
         # Устанавливаем размер окна
         self.screen_size = width, height
         # Создание нового окна
         self.screen = pygame.display.set_mode(self.screen_size)
+
         # Вычисляем количество ячеек по вертикали и горизонтали
         self.cell_width = self.width // self.cell_size
         self.cell_height = self.height // self.cell_size
+
         # Скорость протекания игры
         self.speed = speed
 
-    def draw_grid(self) -> None:
-        """ Cетка игры """
+    def draw_grid(self):
         for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color('black'),
-                             (x, 0), (x, self.height))
+            pygame.draw.line(self.screen, pygame.Color('black'), (
+                x, 0), (x, self.height))
         for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color('black'),
-                             (0, y), (self.width, y))
+            pygame.draw.line(self.screen, pygame.Color('black'), (
+                0, y), (self.width, y))
 
-    def draw_cell_list(self, celllist) -> None:
-        """ Отображение списка клеток
-        """
-        for rown, row in enumerate(celllist.clist):
-            for coln, col in enumerate(row):
-                if col.is_alive():
-                    pygame.draw.rect(self.screen, pygame.Color('green'),
-                                     (rown * self.cell_size, coln * self.cell_size, self.cell_size, self.cell_size))
-                else:
-                    pygame.draw.rect(self.screen, pygame.Color('white'),
-                                     (rown * self.cell_size, coln * self.cell_size, self.cell_size, self.cell_size))
-
-    def run(self) -> None:
-        """ Запустить игру """
+    def run(self):
         pygame.init()
         clock = pygame.time.Clock()
         pygame.display.set_caption('Game of Life')
         self.screen.fill(pygame.Color('white'))
-
-        celllist = CellList(self.cell_width, self.cell_height, randomize=True)
-
+        self.clist = CellList(self.cell_height, self.cell_width, True)
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     running = False
-            self.draw_cell_list(celllist)
             self.draw_grid()
-            celllist.update()
+            self.draw_cell_list()
+            self.clist.update()
             pygame.display.flip()
             clock.tick(self.speed)
         pygame.quit()
 
+    def draw_cell_list(self):
+        for i in range(self.cell_height):
+            for j in range(self.cell_width):
+                x = j * self.cell_size + 1
+                y = i * self.cell_size + 1
+                a = self.cell_size - 1
+                b = self.cell_size - 1
+                if self.clist.grid[i][j].is_alive():
+                    pygame.draw.rect(self.screen, pygame.Color('green'), (
+                        x, y, a, b))
+                else:
+                    pygame.draw.rect(self.screen, pygame.Color('white'), (
+                        x, y, a, b))
+
 
 class Cell:
-    """Класс, описывающий отдельную клетку поля """
-
-    def __init__(self, row: int, col: int, state: bool = False) -> None:
+    def __init__(self, row, col, state=0):
         self.row = row
         self.col = col
-        self.state = state
+        self.alive = state
 
-    def is_alive(self) -> bool:
-        """ Проверка статуса клетки"""
-
-        return self.state
+    def is_alive(self):
+        return self.alive
 
 
 class CellList:
-    """ Класс игрового поля, состоящего из клеток"""
-
-    def __init__(self, nrows: int, ncols: int, randomize: bool = False) -> None:
+    def __init__(self, nrows, ncols, randomize=True):
         self.nrows = nrows
         self.ncols = ncols
-        self.randomize = randomize
-        clist = [[Cell(rown, coln, state=bool(random.randint(0, 1))) for coln in range(ncols)] for rown in range(nrows)]
-        self.clist = clist
+        if (randomize):
+            self.grid = [[Cell(i, j, random.randint(0, 1)) for j in range(ncols)] for i in range(nrows)]
+        else:
+            self.grid = [[Cell(i, j, 0) for j in range(ncols)] for i in range(nrows)]
 
-    def update(self) -> object:
-        """ Обновление игрового поля """
-        new_clist = deepcopy(self.clist)
+    def get_neighbours(self, cell):
+        return [self.grid[i + cell.row][j + cell.col] for i in range(-1, 2) for j in range(-1, 2) if (i | j) and
+                0 <= cell.row + i < self.nrows and 0 <= cell.col + j < self.ncols]
+
+    def update(self):
+        update_grid = copy.deepcopy(self.grid)
         for cell in self:
             neighbours = self.get_neighbours(cell)
-            neighbours_num = 0
-            for neighbour in neighbours:
-                if neighbour.is_alive():
-                    neighbours_num += 1
-            if (neighbours_num == 2 and cell.is_alive()) or neighbours_num == 3:
-                new_clist[cell.row][cell.col] = Cell(cell.row, cell.col, state=True)
+            count = sum(c.is_alive() for c in neighbours)
+            if cell.is_alive():
+                if count < 2 or count > 3:
+                    update_grid[cell.row][cell.col].alive = 0
             else:
-                new_clist[cell.row][cell.col] = Cell(cell.row, cell.col, state=False)
-        self.clist = new_clist
+                if count == 3:
+                    update_grid[cell.row][cell.col].alive = 1
+
+        self.grid = update_grid
         return self
 
-    def get_neighbours(self, cell) -> list:
-        """ Получение состояния соседних клеток """
-
-        return [self.clist[rown + cell.row][coln + cell.col] for rown in range(-1, 2) for coln in range(-1, 2) if (coln or rown) and 0 <= cell.row + rown < self.nrows and 0 <= cell.col + coln < self.ncols]
-
     @classmethod
-    def from_file(cls, filename: str) -> object:
-        """ Получение поля из файла """
-        with open(filename, 'r') as cells_file:
-            cells_str = cells_file.read()
-            row = cells_str.count('\n')
-            cells = [bool(int(c)) for c in cells_str if c in '01']
-        col = len(cells) // row
-        grid = CellList(row, col)
-        count = 0
-        for cell in grid:
-            cell.state = cells[count]
-            count += 1
-        return grid
+    def from_file(cls, filename):
+        grid = []
+        with open(filename) as f:
+            for i, line in enumerate(f):
+                grid.append([Cell(i, j, int(c))
+                             for j, c in enumerate(line) if c in '01'])
+        celllist = cls(len(grid), len(grid[0]), False)
+        celllist.grid = grid
+        return celllist
 
     def __iter__(self):
-        self.row_count = 0
-        self.col_count = 0
+        self.i_count, self.j_count = 0, 0
         return self
 
     def __next__(self):
-        if self.row_count == self.nrows:
+        if (self.i_count == self.nrows):
             raise StopIteration
-        cell = self.clist[self.row_count][self.col_count]
-        self.col_count += 1
-        if self.col_count == self.ncols:
-            self.col_count = 0
-            self.row_count += 1
+
+        cell = self.grid[self.i_count][self.j_count]
+        self.j_count += 1
+        if self.j_count == self.ncols:
+            self.i_count += 1
+            self.j_count = 0
+
         return cell
 
     def __str__(self):
-        list_str = ''
-        for cell in self:
-            if cell.is_alive():
-                list_str += '1'
-            else:
-                pass
-            if cell.col == self.ncols - 1:
-                list_str += '\n'
-        return list_str
+        str = ""
+        for i in range(self.nrows):
+            for j in range(self.ncols):
+                if (self.grid[i][j].alive):
+                    str += '1 '
+                else:
+                    str += '0 '
+            str += '\n'
+        return str
 
 
 if __name__ == '__main__':
-    game = GameOfLife(800, 600, 20)
+    game = GameOfLife(400, 400, 10)
     game.run()
