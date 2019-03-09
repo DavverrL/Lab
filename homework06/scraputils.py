@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
+from time import sleep
 
 
 
@@ -18,10 +19,10 @@ def extract_news(parser):
         comments = title_url.findAll('a')[-1].text[0]
         title = parser.findAll('a', class_="storylink")
         if comments == 'd':
-            comments = '0'
-        posts['author'] = name[i].text + '\n'
+            comments = 0
+        posts['author'] = name[i].text
         posts['points'] = int(points[i].text[0])
-        posts['comments'] = int(comments)
+        posts['comments'] = comments
         posts['title'] = title[i].text
         posts['url'] = title[i].get('href')
 
@@ -35,7 +36,7 @@ def extract_news(parser):
 def extract_next_page(parser):
     """ Extract next page URL """
     next_page = parser.find('a', class_='morelink').get('href')
-
+    print(next_page)
     return next_page
 
 
@@ -51,4 +52,6 @@ def get_news(url, n_pages=1):
         url = "https://news.ycombinator.com/" + next_page
         news.extend(news_list)
         n_pages -= 1
+        if n_pages > 0:
+            sleep(30)
     return news
